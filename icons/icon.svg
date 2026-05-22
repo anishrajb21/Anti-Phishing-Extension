@@ -1,0 +1,31 @@
+<!-- PhishLens Web Shield Icon - SVG Template -->
+<svg width="128" height="128" xmlns="http://www.w3.org/2000/svg">
+  <!-- Gradient Background -->
+  <defs>
+    <linearGradient id="grad1" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#667eea;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#764ba2;stop-opacity:1" />
+    </linearGradient>
+    <linearGradient id="grad2" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#11998e;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#38ef7d;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+  
+  <!-- Shield Shape -->
+  <path d="M 64 10 L 100 25 L 100 60 Q 100 95 64 118 Q 28 95 28 60 L 28 25 Z" 
+        fill="url(#grad1)" stroke="#ffffff" stroke-width="3"/>
+  
+  <!-- Inner Shield Accent -->
+  <path d="M 64 25 L 88 35 L 88 60 Q 88 85 64 102 Q 40 85 40 60 L 40 35 Z" 
+        fill="url(#grad2)" opacity="0.7"/>
+  
+  <!-- Check Mark / Shield Symbol -->
+  <path d="M 52 64 L 60 72 L 78 50" 
+        stroke="#ffffff" stroke-width="6" stroke-linecap="round" 
+        stroke-linejoin="round" fill="none"/>
+  
+  <!-- Eye Symbol (Lens) -->
+  <ellipse cx="64" cy="55" rx="18" ry="12" fill="none" stroke="#ffffff" stroke-width="3" opacity="0.5"/>
+  <circle cx="64" cy="55" r="5" fill="#ffffff" opacity="0.8"/>
+</svg>

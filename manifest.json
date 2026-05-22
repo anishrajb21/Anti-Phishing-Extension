@@ -1,0 +1,46 @@
+{
+  "manifest_version": 3,
+  "name": "PhishLens Web Shield",
+  "version": "1.0.0",
+  "description": "Real-time phishing detection for all websites you visit",
+  "permissions": [
+    "webNavigation",
+    "tabs",
+    "storage",
+    "activeTab",
+    "scripting",
+    "declarativeNetRequest"
+  ],
+  "host_permissions": [
+    "<all_urls>"
+  ],
+  "background": {
+    "service_worker": "background.js"
+  },
+  "content_scripts": [
+    {
+      "matches": ["<all_urls>"],
+      "js": ["content.js"],
+      "run_at": "document_start"
+    }
+  ],
+  "action": {
+    "default_popup": "popup/popup.html",
+    "default_icon": {
+      "16": "icons/16.png",
+      "48": "icons/48.png",
+      "128": "icons/128.png"
+    }
+  },
+  "icons": {
+    "16": "icons/16.png",
+    "48": "icons/48.png",
+    "128": "icons/128.png"
+  },
+  "web_accessible_resources": [
+    {
+      "resources": ["model/phishing_model.json", "popup/blocked.html", "popup/blocked.js"],
+      "matches": ["<all_urls>"]
+    }
+  ]
+}

@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PhishLens Web Shield</title>
+  <link rel="stylesheet" href="popup.css">
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <h1>🛡️ PhishLens Web Shield</h1>
+      <p class="tagline">Real-time Phishing Protection</p>
+    </div>
+
+    <div id="loading" class="loading">
+      <div class="spinner"></div>
+      <p>Analyzing website...</p>
+    </div>
+
+    <div id="results" class="results" style="display: none;">
+      <!-- Status Banner -->
+      <div id="status-banner" class="status-banner">
+        <div class="status-icon" id="status-icon"></div>
+        <div class="status-text">
+          <div class="status-title" id="status-title"></div>
+          <div class="status-message" id="status-message"></div>
+        </div>
+      </div>
+
+      <!-- Risk Meter -->
+      <div class="risk-meter">
+        <div class="meter-label">
+          <span>Risk Score</span>
+          <span class="score-value" id="score-value">0</span>
+        </div>
+        <div class="meter-bar">
+          <div class="meter-fill" id="meter-fill"></div>
+        </div>
+        <div class="meter-labels">
+          <span>Safe</span>
+          <span>Moderate</span>
+          <span>High Risk</span>
+        </div>
+      </div>
+
+      <!-- Website Details -->
+      <div class="details-section">
+        <h3>Website Analysis</h3>
+        
+        <div class="detail-item">
+          <span class="detail-label">🌐 URL:</span>
+          <span class="detail-value" id="url-value">-</span>
+        </div>
+
+        <div class="detail-item">
+          <span class="detail-label">🔒 SSL/HTTPS:</span>
+          <span class="detail-value" id="ssl-value">-</span>
+        </div>
+
+        <div class="detail-item">
+          <span class="detail-label">📅 Domain Age:</span>
+          <span class="detail-value" id="domain-age-value">-</span>
+        </div>
+
+        <div class="detail-item">
+          <span class="detail-label">🤖 ML Score:</span>
+          <span class="detail-value" id="ml-score-value">-</span>
+        </div>
+
+        <div class="detail-item">
+          <span class="detail-label">🔍 Heuristic Score:</span>
+          <span class="detail-value" id="heuristic-score-value">-</span>
+        </div>
+      </div>
+
+      <!-- Risk Factors -->
+      <div class="risk-factors" id="risk-factors">
+        <h3>Detection Summary</h3>
+        <p id="risk-reason" class="risk-reason-text">-</p>
+      </div>
+
+      <!-- Technical Details (Collapsible) -->
+      <details class="tech-details">
+        <summary>🔧 Technical Analysis</summary>
+        <div class="tech-content">
+          <div class="tech-item">
+            <span>URL Length:</span>
+            <span id="tech-url-length">-</span>
+          </div>
+          <div class="tech-item">
+            <span>Subdomains:</span>
+            <span id="tech-subdomains">-</span>
+          </div>
+          <div class="tech-item">
+            <span>Hyphens:</span>
+            <span id="tech-hyphens">-</span>
+          </div>
+          <div class="tech-item">
+            <span>IP Address:</span>
+            <span id="tech-ip">-</span>
+          </div>
+          <div class="tech-item">
+            <span>Domain Entropy:</span>
+            <span id="tech-entropy">-</span>
+          </div>
+          <div class="tech-item">
+            <span>Special Characters:</span>
+            <span id="tech-special">-</span>
+          </div>
+        </div>
+      </details>
+    </div>
+
+    <div id="error" class="error" style="display: none;">
+      <p>⏳ Analysis In Progress</p>
+      <p class="error-detail">PhishLens is analyzing this website. Please wait a moment and try again.</p>
+      <p class="error-detail" style="margin-top: 10px; font-size: 11px;">Note: Analysis doesn't work on chrome:// internal pages.</p>
+    </div>
+  </div>
+
+  <script src="popup.js"></script>
+</body>
+</html>
