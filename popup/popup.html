@@ -7,116 +7,118 @@
   <link rel="stylesheet" href="popup.css">
 </head>
 <body>
-  <div class="container">
-    <div class="header">
-      <h1>🛡️ PhishLens Web Shield</h1>
-      <p class="tagline">Real-time Phishing Protection</p>
-    </div>
-
-    <div id="loading" class="loading">
-      <div class="spinner"></div>
-      <p>Analyzing website...</p>
-    </div>
-
-    <div id="results" class="results" style="display: none;">
-      <!-- Status Banner -->
-      <div id="status-banner" class="status-banner">
-        <div class="status-icon" id="status-icon"></div>
-        <div class="status-text">
-          <div class="status-title" id="status-title"></div>
-          <div class="status-message" id="status-message"></div>
+  <div class="extension-card">
+    <!-- Header -->
+    <header class="app-header">
+      <div class="brand">
+        <span class="brand-icon">🛡️</span>
+        <div>
+          <h1 class="brand-title">PhishLens Sentinel</h1>
+          <span class="brand-tagline">On-Device Phishing Defense</span>
         </div>
       </div>
+      <button class="btn-icon" id="btn-rescan" title="Re-scan Website" aria-label="Re-scan current website">
+        🔄
+      </button>
+    </header>
+
+    <!-- Loading State -->
+    <div id="state-loading" class="state-container">
+      <div class="loader-spinner"></div>
+      <p class="loader-text">Analyzing URL indicators...</p>
+    </div>
+
+    <!-- Active Results State -->
+    <main id="state-results" class="state-container" style="display: none;">
+      <!-- Verdict Card -->
+      <section id="verdict-banner" class="verdict-banner low-risk">
+        <div class="verdict-icon" id="verdict-icon">✓</div>
+        <div class="verdict-content">
+          <div class="verdict-status" id="verdict-status">LOW RISK</div>
+          <div class="verdict-summary" id="verdict-summary">No prominent phishing indicators detected.</div>
+        </div>
+      </section>
 
       <!-- Risk Meter -->
-      <div class="risk-meter">
-        <div class="meter-label">
-          <span>Risk Score</span>
-          <span class="score-value" id="score-value">0</span>
+      <section class="meter-section">
+        <div class="meter-header">
+          <span class="meter-label">Threat Risk Score</span>
+          <span class="meter-value" id="meter-score-text">0 / 100</span>
         </div>
-        <div class="meter-bar">
-          <div class="meter-fill" id="meter-fill"></div>
+        <div class="meter-track">
+          <div class="meter-fill" id="meter-fill" style="width: 0%;"></div>
         </div>
-        <div class="meter-labels">
-          <span>Safe</span>
-          <span>Moderate</span>
-          <span>High Risk</span>
+        <div class="meter-scale">
+          <span>0 (Low)</span>
+          <span>35 (Suspicious)</span>
+          <span>70 (High)</span>
         </div>
-      </div>
+      </section>
 
-      <!-- Website Details -->
-      <div class="details-section">
-        <h3>Website Analysis</h3>
-        
-        <div class="detail-item">
-          <span class="detail-label">🌐 URL:</span>
-          <span class="detail-value" id="url-value">-</span>
+      <!-- Target URL Box -->
+      <section class="target-card">
+        <div class="target-meta">
+          <span class="meta-label">Analyzed Host:</span>
+          <span class="meta-value" id="target-host">-</span>
         </div>
-
-        <div class="detail-item">
-          <span class="detail-label">🔒 SSL/HTTPS:</span>
-          <span class="detail-value" id="ssl-value">-</span>
+        <div class="target-meta">
+          <span class="meta-label">Protocol / Port:</span>
+          <span class="meta-value" id="target-transport">-</span>
         </div>
+      </section>
 
-        <div class="detail-item">
-          <span class="detail-label">📅 Domain Age:</span>
-          <span class="detail-value" id="domain-age-value">-</span>
+      <!-- Detection Engines Status -->
+      <section class="engines-grid">
+        <div class="engine-pill">
+          <span class="engine-dot" id="dot-ml"></span>
+          <span class="engine-name">AI / ML Model</span>
+          <span class="engine-val" id="val-ml">Active</span>
         </div>
-
-        <div class="detail-item">
-          <span class="detail-label">🤖 ML Score:</span>
-          <span class="detail-value" id="ml-score-value">-</span>
+        <div class="engine-pill">
+          <span class="engine-dot" id="dot-heuristics"></span>
+          <span class="engine-name">Heuristics</span>
+          <span class="engine-val" id="val-heuristics">Active</span>
         </div>
-
-        <div class="detail-item">
-          <span class="detail-label">🔍 Heuristic Score:</span>
-          <span class="detail-value" id="heuristic-score-value">-</span>
+        <div class="engine-pill">
+          <span class="engine-dot" id="dot-threat"></span>
+          <span class="engine-name">Threat Intel</span>
+          <span class="engine-val" id="val-threat">Local Feed</span>
         </div>
-      </div>
+      </section>
 
-      <!-- Risk Factors -->
-      <div class="risk-factors" id="risk-factors">
-        <h3>Detection Summary</h3>
-        <p id="risk-reason" class="risk-reason-text">-</p>
-      </div>
+      <!-- Structured Reasons -->
+      <section class="reasons-section" id="reasons-wrapper">
+        <h2 class="section-title">Detection Factors</h2>
+        <ul class="reasons-list" id="reasons-list">
+          <!-- Populated by JS -->
+        </ul>
+      </section>
 
-      <!-- Technical Details (Collapsible) -->
-      <details class="tech-details">
-        <summary>🔧 Technical Analysis</summary>
-        <div class="tech-content">
-          <div class="tech-item">
-            <span>URL Length:</span>
-            <span id="tech-url-length">-</span>
-          </div>
-          <div class="tech-item">
-            <span>Subdomains:</span>
-            <span id="tech-subdomains">-</span>
-          </div>
-          <div class="tech-item">
-            <span>Hyphens:</span>
-            <span id="tech-hyphens">-</span>
-          </div>
-          <div class="tech-item">
-            <span>IP Address:</span>
-            <span id="tech-ip">-</span>
-          </div>
-          <div class="tech-item">
-            <span>Domain Entropy:</span>
-            <span id="tech-entropy">-</span>
-          </div>
-          <div class="tech-item">
-            <span>Special Characters:</span>
-            <span id="tech-special">-</span>
-          </div>
+      <!-- Technical Indicator Breakdown (Collapsible) -->
+      <details class="tech-drawer">
+        <summary class="tech-summary">🔧 Technical Analysis Metrics</summary>
+        <div class="tech-grid">
+          <div class="tech-row"><span>Domain Entropy:</span><strong id="tech-entropy">-</strong></div>
+          <div class="tech-row"><span>Registrable Domain:</span><strong id="tech-registrable">-</strong></div>
+          <div class="tech-row"><span>Subdomain Count:</span><strong id="tech-subdomains">-</strong></div>
+          <div class="tech-row"><span>Hyphen Count:</span><strong id="tech-hyphens">-</strong></div>
+          <div class="tech-row"><span>Numeric Host:</span><strong id="tech-numeric">-</strong></div>
+          <div class="tech-row"><span>Punycode / IDN:</span><strong id="tech-idn">-</strong></div>
         </div>
       </details>
+    </main>
+
+    <!-- Error State -->
+    <div id="state-error" class="state-container" style="display: none;">
+      <div class="error-icon" id="error-icon">ℹ️</div>
+      <h2 class="error-title" id="error-title">Page Cannot Be Analyzed</h2>
+      <p class="error-msg" id="error-msg">PhishLens only inspects public HTTP and HTTPS websites.</p>
     </div>
 
-    <div id="error" class="error" style="display: none;">
-      <p>⏳ Analysis In Progress</p>
-      <p class="error-detail">PhishLens is analyzing this website. Please wait a moment and try again.</p>
-      <p class="error-detail" style="margin-top: 10px; font-size: 11px;">Note: Analysis doesn't work on chrome:// internal pages.</p>
-    </div>
+    <!-- Footer -->
+    <footer class="app-footer">
+      <span>🔒 Privacy Protected • On-Device Verification</span>
+    </footer>
   </div>
 
   <script src="popup.js"></script>

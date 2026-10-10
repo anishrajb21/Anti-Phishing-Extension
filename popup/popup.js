@@ -1,189 +1,215 @@
-// PhishLens Web Shield - Popup Script
-// Displays detailed analysis of current webpage
+/**
+ * PhishLens Web Shield - Popup Script
+ * Coordinates active tab analysis queries, UI data binding, and manual rescans.
+ */
 
 document.addEventListener('DOMContentLoaded', async () => {
-  const loading = document.getElementById('loading');
-  const results = document.getElementById('results');
-  const error = document.getElementById('error');
+  const stateLoading = document.getElementById('state-loading');
+  const stateResults = document.getElementById('state-results');
+  const stateError = document.getElementById('state-error');
+  const btnRescan = document.getElementById('btn-rescan');
 
-  try {
-    // Get current tab
-    const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
-    
-    if (!tab || !tab.url) {
-      showError();
-      return;
-    }
+  const errorTitle = document.getElementById('error-title');
+  const errorMsg = document.getElementById('error-msg');
 
-    // Check if it's a chrome:// or extension page
-    if (tab.url.startsWith('chrome://') || tab.url.startsWith('chrome-extension://') || tab.url.startsWith('about:')) {
-      error.querySelector('p').textContent = '⚠️ Cannot Analyze This Page';
-      error.querySelector('.error-detail').textContent = 'Analysis only works on regular websites (HTTP/HTTPS).';
-      showError();
-      return;
-    }
+  let currentTab = null;
 
-    // Function to get or trigger analysis
-    const getAnalysis = async () => {
+  async function loadTabAndAnalysis() {
+    stateLoading.style.display = 'flex';
+    stateResults.style.display = 'none';
+    stateError.style.display = 'none';
+
+    try {
+      const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
+      currentTab = tab;
+
+      if (!tab || !tab.url) {
+        showError('No Webpage Detected', 'Please open a valid website tab to run PhishLens analysis.');
+        return;
+      }
+
+      // Check scheme
+      if (tab.url.startsWith('chrome://') || tab.url.startsWith('chrome-extension://') || tab.url.startsWith('about:')) {
+        showError('Browser Internal Page', 'PhishLens only inspects public HTTP and HTTPS websites.');
+        return;
+      }
+
+      // Query background service worker
       const response = await chrome.runtime.sendMessage({ action: 'getAnalysis' });
-      
-      if (response && response.url === tab.url) {
-        return response;
+
+      if (response && response.status === 'SUCCESS' && response.verdict) {
+        renderVerdict(response.verdict, response.isBypassed);
+      } else {
+        // Trigger fresh analysis
+        const scanRes = await chrome.runtime.sendMessage({
+          action: 'analyzeURL',
+          url: tab.url,
+          tabId: tab.id
+        });
+
+        if (scanRes && scanRes.status === 'SUCCESS' && scanRes.verdict) {
+          renderVerdict(scanRes.verdict, false);
+        } else {
+          showError('Analysis Failed', 'Could not complete analysis for this page.');
+        }
       }
-      
-      // If no response or URL mismatch, trigger analysis via background
-      console.log('PhishLens Popup: Triggering fresh analysis for', tab.url);
-      
-      // Send message to background to analyze this specific URL
-      const triggerResponse = await chrome.runtime.sendMessage({ 
-        action: 'analyzeURL', 
-        url: tab.url,
-        tabId: tab.id
+    } catch (err) {
+      console.error('[PhishLens Popup] Error loading analysis:', err);
+      showError('Connection Error', 'Could not communicate with PhishLens background defense service.');
+    }
+  }
+
+  function renderVerdict(verdict, isBypassed = false) {
+    stateLoading.style.display = 'none';
+    stateError.style.display = 'none';
+    stateResults.style.display = 'block';
+
+    const { category, score, summary, reasons, hostname, url, details } = verdict;
+
+    // 1. Verdict Banner
+    const banner = document.getElementById('verdict-banner');
+    const vIcon = document.getElementById('verdict-icon');
+    const vStatus = document.getElementById('verdict-status');
+    const vSummary = document.getElementById('verdict-summary');
+
+    banner.className = 'verdict-banner ' + category.toLowerCase().replace('_', '-');
+
+    if (category === 'LOW_RISK') {
+      vIcon.textContent = '✓';
+      vStatus.textContent = 'LOW RISK';
+    } else if (category === 'SUSPICIOUS') {
+      vIcon.textContent = '⚠️';
+      vStatus.textContent = isBypassed ? 'SUSPICIOUS (BYPASSED)' : 'SUSPICIOUS';
+    } else if (category === 'HIGH_RISK') {
+      vIcon.textContent = '🛑';
+      vStatus.textContent = isBypassed ? 'HIGH RISK (BYPASSED)' : 'HIGH RISK';
+    } else {
+      vIcon.textContent = '?';
+      vStatus.textContent = 'ANALYSIS ERROR';
+    }
+
+    vSummary.textContent = summary || 'Inspection complete.';
+
+    // 2. Risk Meter
+    const scoreVal = typeof score === 'number' ? score : 0;
+    const scoreText = document.getElementById('meter-score-text');
+    const meterFill = document.getElementById('meter-fill');
+
+    scoreText.textContent = `${scoreVal} / 100`;
+    meterFill.style.width = `${Math.min(100, Math.max(5, scoreVal))}%`;
+
+    if (scoreVal < 35) {
+      meterFill.style.backgroundColor = 'var(--safe-primary)';
+    } else if (scoreVal < 70) {
+      meterFill.style.backgroundColor = 'var(--warning-primary)';
+    } else {
+      meterFill.style.backgroundColor = 'var(--danger-primary)';
+    }
+
+    // 3. Target Meta
+    document.getElementById('target-host').textContent = hostname || 'Unknown';
+    try {
+      const u = new URL(url);
+      document.getElementById('target-transport').textContent = `${u.protocol.toUpperCase()} (Port ${u.port || (u.protocol === 'https:' ? '443' : '80')})`;
+    } catch {
+      document.getElementById('target-transport').textContent = 'Standard';
+    }
+
+    // 4. Engines Grid
+    const mlDot = document.getElementById('dot-ml');
+    const mlVal = document.getElementById('val-ml');
+    if (details?.ml?.available) {
+      const probPct = Math.round(details.ml.probability * 100);
+      mlVal.textContent = `${probPct}% Prob`;
+      mlDot.style.background = probPct >= 50 ? 'var(--danger-primary)' : 'var(--safe-primary)';
+    } else {
+      mlVal.textContent = 'Offline';
+      mlDot.style.background = 'var(--text-muted)';
+    }
+
+    const heurVal = document.getElementById('val-heuristics');
+    heurVal.textContent = `${details?.heuristic?.score ?? 0}/100`;
+
+    const threatVal = document.getElementById('val-threat');
+    const threatDot = document.getElementById('dot-threat');
+    const threatVerd = details?.threatIntel?.verdict;
+    if (threatVerd === 'KNOWN_MALICIOUS') {
+      threatVal.textContent = 'FLAGGED';
+      threatDot.style.background = 'var(--danger-primary)';
+    } else if (threatVerd === 'SAFE') {
+      threatVal.textContent = 'VERIFIED';
+      threatDot.style.background = 'var(--safe-primary)';
+    } else {
+      threatVal.textContent = 'Neutral';
+      threatDot.style.background = 'var(--safe-primary)';
+    }
+
+    // 5. Reasons List
+    const reasonsList = document.getElementById('reasons-list');
+    reasonsList.innerHTML = '';
+
+    if (Array.isArray(reasons) && reasons.length > 0) {
+      reasons.forEach(r => {
+        const li = document.createElement('li');
+        
+        const tag = document.createElement('span');
+        tag.className = `reason-tag ${r.severity || 'INFO'}`;
+        tag.textContent = r.severity || 'INFO';
+
+        const text = document.createElement('span');
+        text.textContent = `${r.title}: ${r.description}`;
+
+        li.appendChild(tag);
+        li.appendChild(text);
+        reasonsList.appendChild(li);
       });
-      
-      if (triggerResponse) {
-        return triggerResponse;
+    } else {
+      const li = document.createElement('li');
+      li.textContent = 'No adverse security flags detected on this URL.';
+      reasonsList.appendChild(li);
+    }
+
+    // 6. Technical Metrics
+    const feats = details?.features || {};
+    const dom = details?.domain || {};
+
+    document.getElementById('tech-entropy').textContent = typeof feats.domainEntropy === 'number' ? feats.domainEntropy.toFixed(2) + ' bits' : '-';
+    document.getElementById('tech-registrable').textContent = dom.registrableDomain || hostname || '-';
+    document.getElementById('tech-subdomains').textContent = typeof feats.numDots === 'number' ? feats.numDots : '-';
+    document.getElementById('tech-hyphens').textContent = typeof feats.numHyphens === 'number' ? feats.numHyphens : '-';
+    document.getElementById('tech-numeric').textContent = feats.hasIP ? 'Yes (Direct IP)' : (feats.numDigits > 0 ? `${feats.numDigits} digits` : 'No');
+    document.getElementById('tech-idn').textContent = hostname.includes('xn--') ? 'Yes (Punycode)' : 'No (Standard ASCII)';
+  }
+
+  function showError(title, message) {
+    stateLoading.style.display = 'none';
+    stateResults.style.display = 'none';
+    stateError.style.display = 'block';
+
+    errorTitle.textContent = title;
+    errorMsg.textContent = message;
+  }
+
+  btnRescan.addEventListener('click', async () => {
+    btnRescan.style.transform = 'rotate(180deg)';
+    setTimeout(() => { btnRescan.style.transform = ''; }, 300);
+
+    if (currentTab && currentTab.url) {
+      stateLoading.style.display = 'flex';
+      stateResults.style.display = 'none';
+
+      const scanRes = await chrome.runtime.sendMessage({
+        action: 'analyzeURL',
+        url: currentTab.url,
+        tabId: currentTab.id
+      });
+
+      if (scanRes && scanRes.status === 'SUCCESS' && scanRes.verdict) {
+        renderVerdict(scanRes.verdict, false);
       }
-      
-      return null;
-    };
-
-    // Try to get analysis
-    let analysisData = await getAnalysis();
-    
-    // If still no data, wait a bit and retry
-    if (!analysisData) {
-      loading.querySelector('p').textContent = 'Analyzing website...';
-      await new Promise(resolve => setTimeout(resolve, 500));
-      analysisData = await getAnalysis();
     }
-    
-    // Final retry
-    if (!analysisData) {
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      analysisData = await getAnalysis();
-    }
+  });
 
-    if (!analysisData) {
-      showError();
-      return;
-    }
-
-    // Hide loading, show results
-    loading.style.display = 'none';
-    results.style.display = 'block';
-
-    // Populate UI with analysis data
-    displayResults(analysisData);
-  } catch (err) {
-    console.error('Error loading analysis:', err);
-    showError();
-  }
+  // Initial load
+  loadTabAndAnalysis();
 });
-
-function displayResults(data) {
-  const { safe, score, reason, url, features, mlScore, heuristicScore, domainAge } = data;
-
-  // Status Banner
-  const statusBanner = document.getElementById('status-banner');
-  const statusIcon = document.getElementById('status-icon');
-  const statusTitle = document.getElementById('status-title');
-  const statusMessage = document.getElementById('status-message');
-
-  if (safe) {
-    statusBanner.className = 'status-banner safe';
-    statusIcon.textContent = '🟢';
-    statusTitle.textContent = 'SAFE';
-    statusMessage.textContent = 'This website looks legitimate.';
-  } else {
-    statusBanner.className = 'status-banner unsafe';
-    statusIcon.textContent = '🔴';
-    statusTitle.textContent = 'UNSAFE';
-    statusMessage.textContent = 'This website appears suspicious or phishing.';
-  }
-
-  // Risk Score
-  const scoreValue = document.getElementById('score-value');
-  const meterFill = document.getElementById('meter-fill');
-
-  scoreValue.textContent = `${score}/100`;
-  meterFill.style.width = `${score}%`;
-
-  if (score < 30) {
-    meterFill.className = 'meter-fill safe';
-  } else if (score < 60) {
-    meterFill.className = 'meter-fill moderate';
-  } else {
-    meterFill.className = 'meter-fill unsafe';
-  }
-
-  // URL
-  try {
-    const urlObj = new URL(url);
-    document.getElementById('url-value').textContent = urlObj.hostname;
-  } catch (e) {
-    document.getElementById('url-value').textContent = 'Invalid URL';
-  }
-
-  // SSL/HTTPS
-  const sslValue = document.getElementById('ssl-value');
-  if (features && features.hasHTTPS) {
-    sslValue.textContent = '✅ Valid HTTPS';
-    sslValue.style.color = '#28a745';
-  } else {
-    sslValue.textContent = '⚠️ No HTTPS';
-    sslValue.style.color = '#dc3545';
-  }
-
-  // Domain Age
-  const domainAgeValue = document.getElementById('domain-age-value');
-  if (domainAge !== null && domainAge !== undefined) {
-    if (domainAge < 30) {
-      domainAgeValue.textContent = `${domainAge} days (Very New ⚠️)`;
-      domainAgeValue.style.color = '#dc3545';
-    } else if (domainAge < 365) {
-      domainAgeValue.textContent = `${domainAge} days`;
-      domainAgeValue.style.color = '#f39c12';
-    } else {
-      const years = Math.floor(domainAge / 365);
-      domainAgeValue.textContent = `~${years} year${years > 1 ? 's' : ''} ✅`;
-      domainAgeValue.style.color = '#28a745';
-    }
-  } else {
-    domainAgeValue.textContent = 'Not available';
-    domainAgeValue.style.color = '#999';
-  }
-
-  // ML Score
-  document.getElementById('ml-score-value').textContent = mlScore !== undefined ? `${mlScore}/100` : 'N/A';
-
-  // Heuristic Score
-  document.getElementById('heuristic-score-value').textContent = heuristicScore !== undefined ? `${heuristicScore}/100` : 'N/A';
-
-  // Risk Reason
-  document.getElementById('risk-reason').textContent = reason || 'No specific risk factors detected.';
-
-  // Technical Details
-  if (features) {
-    document.getElementById('tech-url-length').textContent = features.urlLength || '-';
-    document.getElementById('tech-subdomains').textContent = features.numDots || '-';
-    document.getElementById('tech-hyphens').textContent = features.numHyphens || '-';
-    document.getElementById('tech-ip').textContent = features.hasIP ? '⚠️ Yes' : '✅ No';
-    document.getElementById('tech-entropy').textContent = features.domainEntropy ? features.domainEntropy.toFixed(2) : '-';
-    document.getElementById('tech-special').textContent = features.numSpecialChars || '-';
-
-    // Colorize IP warning
-    const ipElement = document.getElementById('tech-ip');
-    if (features.hasIP) {
-      ipElement.style.color = '#dc3545';
-      ipElement.style.fontWeight = '700';
-    } else {
-      ipElement.style.color = '#28a745';
-    }
-  }
-}
-
-function showError() {
-  document.getElementById('loading').style.display = 'none';
-  document.getElementById('error').style.display = 'block';
-}

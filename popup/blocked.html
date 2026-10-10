@@ -3,312 +3,267 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>⚠️ Phishing Warning - Site Blocked</title>
+  <title>PhishLens Security Warning — Malicious Website Blocked</title>
   <style>
+    :root {
+      --bg-primary: #0f172a;
+      --card-bg: #1e293b;
+      --border-color: #334155;
+      --text-main: #f8fafc;
+      --text-muted: #94a3b8;
+      --danger: #ef4444;
+      --danger-dark: #dc2626;
+      --danger-glow: rgba(239, 68, 68, 0.2);
+      --safe: #10b981;
+      --safe-dark: #059669;
+      --accent: #6366f1;
+    }
+
     * {
+      box-sizing: border-box;
       margin: 0;
       padding: 0;
-      box-sizing: border-box;
     }
 
     body {
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
-      background: linear-gradient(135deg, #c0392b 0%, #e74c3c 100%);
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+      background: radial-gradient(circle at 50% 20%, #1e1b4b 0%, var(--bg-primary) 70%);
+      color: var(--text-main);
       min-height: 100vh;
       display: flex;
       align-items: center;
       justify-content: center;
-      padding: 20px;
+      padding: 24px;
+      line-height: 1.6;
     }
 
-    .container {
-      background: white;
-      border-radius: 20px;
-      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
-      max-width: 700px;
+    .warning-container {
+      background: var(--card-bg);
+      border: 1px solid var(--border-color);
+      border-radius: 16px;
+      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5), 0 0 40px var(--danger-glow);
+      max-width: 680px;
       width: 100%;
-      padding: 50px;
-      text-align: center;
-      animation: slideIn 0.5s ease-out;
+      padding: 40px;
     }
 
-    @keyframes slideIn {
-      from {
-        opacity: 0;
-        transform: translateY(-50px);
-      }
-      to {
-        opacity: 1;
-        transform: translateY(0);
-      }
-    }
-
-    .icon {
-      font-size: 100px;
-      margin-bottom: 20px;
-      animation: pulse 2s infinite;
-    }
-
-    @keyframes pulse {
-      0%, 100% {
-        transform: scale(1);
-      }
-      50% {
-        transform: scale(1.1);
-      }
-    }
-
-    h1 {
-      color: #c0392b;
-      font-size: 32px;
-      margin-bottom: 15px;
-      font-weight: 700;
-    }
-
-    .subtitle {
-      color: #666;
-      font-size: 18px;
-      margin-bottom: 30px;
-    }
-
-    .warning-box {
-      background: #fff3cd;
-      border: 2px solid #ffc107;
-      border-radius: 12px;
-      padding: 25px;
-      margin: 30px 0;
-      text-align: left;
-    }
-
-    .warning-box h3 {
-      color: #856404;
-      margin-bottom: 15px;
-      font-size: 18px;
+    .warning-header {
       display: flex;
       align-items: center;
-      gap: 10px;
-    }
-
-    .warning-box p {
-      color: #856404;
-      line-height: 1.6;
-      margin-bottom: 10px;
-    }
-
-    .risk-score {
-      background: linear-gradient(135deg, #eb3349 0%, #f45c43 100%);
-      color: white;
-      padding: 15px 30px;
-      border-radius: 50px;
-      display: inline-block;
-      font-size: 24px;
-      font-weight: 700;
-      margin: 20px 0;
-      box-shadow: 0 4px 15px rgba(235, 51, 73, 0.3);
-    }
-
-    .url-display {
-      background: #f8f9fa;
-      border: 1px solid #dee2e6;
-      border-radius: 8px;
-      padding: 15px;
-      word-break: break-all;
-      font-family: monospace;
-      color: #495057;
-      margin: 20px 0;
-      font-size: 14px;
-    }
-
-    .reasons {
-      background: #f8d7da;
-      border: 1px solid #f5c6cb;
-      border-radius: 8px;
-      padding: 20px;
-      margin: 20px 0;
-      text-align: left;
-    }
-
-    .reasons h4 {
-      color: #721c24;
-      margin-bottom: 15px;
-      font-size: 16px;
-    }
-
-    .reasons ul {
-      list-style: none;
-      padding: 0;
-    }
-
-    .reasons li {
-      color: #721c24;
-      padding: 8px 0;
-      padding-left: 25px;
-      position: relative;
-    }
-
-    .reasons li:before {
-      content: "✗";
-      position: absolute;
-      left: 0;
-      color: #dc3545;
-      font-weight: bold;
-      font-size: 18px;
-    }
-
-    .buttons {
-      display: flex;
-      gap: 15px;
-      margin-top: 30px;
-      flex-wrap: wrap;
-      justify-content: center;
-    }
-
-    .btn {
-      padding: 15px 40px;
-      border: none;
-      border-radius: 50px;
-      font-size: 16px;
-      font-weight: 600;
-      cursor: pointer;
-      transition: all 0.3s;
-      text-decoration: none;
-      display: inline-block;
-    }
-
-    .btn-safe {
-      background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
-      color: white;
-      box-shadow: 0 4px 15px rgba(17, 153, 142, 0.3);
-    }
-
-    .btn-safe:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 6px 20px rgba(17, 153, 142, 0.4);
-    }
-
-    .btn-risk {
-      background: #6c757d;
-      color: white;
-      box-shadow: 0 4px 15px rgba(108, 117, 125, 0.3);
-    }
-
-    .btn-risk:hover {
-      background: #5a6268;
-      transform: translateY(-2px);
+      gap: 16px;
+      margin-bottom: 24px;
+      border-bottom: 1px solid var(--border-color);
+      padding-bottom: 20px;
     }
 
     .shield-icon {
-      display: inline-block;
-      margin-right: 8px;
+      width: 56px;
+      height: 56px;
+      background: rgba(239, 68, 68, 0.15);
+      border: 1px solid var(--danger);
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 28px;
+      flex-shrink: 0;
     }
 
-    .info-box {
-      background: #d1ecf1;
-      border: 1px solid #bee5eb;
+    .header-text h1 {
+      font-size: 24px;
+      font-weight: 700;
+      color: #fee2e2;
+      letter-spacing: -0.02em;
+    }
+
+    .header-text p {
+      color: var(--text-muted);
+      font-size: 14px;
+      margin-top: 4px;
+    }
+
+    .risk-banner {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: rgba(239, 68, 68, 0.1);
+      border-left: 4px solid var(--danger);
+      padding: 12px 18px;
       border-radius: 8px;
-      padding: 15px;
-      margin-top: 30px;
-      color: #0c5460;
+      margin-bottom: 24px;
+    }
+
+    .risk-banner-label {
+      font-size: 14px;
+      font-weight: 600;
+      color: #fca5a5;
+    }
+
+    .risk-score-pill {
+      background: var(--danger);
+      color: white;
+      padding: 4px 12px;
+      border-radius: 20px;
+      font-size: 13px;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+    }
+
+    .target-box {
+      background: #0f172a;
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      padding: 12px 16px;
+      margin-bottom: 24px;
+      word-break: break-all;
+    }
+
+    .target-label {
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--text-muted);
+      margin-bottom: 4px;
+    }
+
+    .target-url {
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+      color: #e2e8f0;
       font-size: 14px;
     }
 
-    .details-section {
-      margin-top: 30px;
-      padding-top: 30px;
-      border-top: 2px solid #e9ecef;
+    .details-box {
+      margin-bottom: 28px;
     }
 
-    .detail-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-      gap: 15px;
-      margin-top: 20px;
-    }
-
-    .detail-card {
-      background: #f8f9fa;
-      padding: 15px;
-      border-radius: 8px;
-      border: 1px solid #dee2e6;
-    }
-
-    .detail-label {
-      font-size: 12px;
-      color: #6c757d;
-      text-transform: uppercase;
-      margin-bottom: 5px;
-    }
-
-    .detail-value {
-      font-size: 18px;
+    .details-box h3 {
+      font-size: 15px;
       font-weight: 600;
-      color: #333;
+      color: var(--text-main);
+      margin-bottom: 12px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .details-list {
+      list-style: none;
+    }
+
+    .details-list li {
+      position: relative;
+      padding-left: 24px;
+      margin-bottom: 10px;
+      color: #cbd5e1;
+      font-size: 14px;
+    }
+
+    .details-list li::before {
+      content: "•";
+      position: absolute;
+      left: 8px;
+      color: var(--danger);
+      font-size: 18px;
+      line-height: 1;
+    }
+
+    .disclaimer-box {
+      background: rgba(148, 163, 184, 0.05);
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      padding: 12px 16px;
+      font-size: 12px;
+      color: var(--text-muted);
+      margin-bottom: 28px;
+    }
+
+    .actions-group {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+
+    .btn {
+      font-size: 14px;
+      font-weight: 600;
+      border-radius: 8px;
+      padding: 12px 24px;
+      cursor: pointer;
+      transition: all 0.2s;
+      border: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      text-decoration: none;
+    }
+
+    .btn-primary-safe {
+      background: var(--safe);
+      color: #022c22;
+      box-shadow: 0 4px 14px rgba(16, 185, 129, 0.3);
+    }
+
+    .btn-primary-safe:hover {
+      background: var(--safe-dark);
+      color: #ffffff;
+    }
+
+    .btn-danger-outline {
+      background: transparent;
+      color: var(--text-muted);
+      border: 1px solid var(--border-color);
+    }
+
+    .btn-danger-outline:hover {
+      color: #fca5a5;
+      border-color: #f87171;
     }
   </style>
 </head>
 <body>
-  <div class="container">
-    <div class="icon">🛑</div>
-    <h1>⚠️ Dangerous Website Blocked</h1>
-    <p class="subtitle">PhishLens Web Shield has blocked access to this potentially harmful website</p>
-
-    <div class="risk-score">
-      <span class="shield-icon">🛡️</span>
-      Risk Score: <span id="score-display">--</span>/100
-    </div>
-
-    <div class="warning-box">
-      <h3>
-        <span>⚠️</span>
-        <span>Why was this site blocked?</span>
-      </h3>
-      <p>Our advanced phishing detection system identified multiple suspicious indicators that suggest this website may be attempting to steal your personal information, credentials, or financial data.</p>
-    </div>
-
-    <div class="url-display" id="blocked-url">
-      Loading...
-    </div>
-
-    <div class="reasons" id="reasons-container">
-      <h4>🔍 Detected Risk Factors:</h4>
-      <ul id="risk-list">
-        <li>Analyzing...</li>
-      </ul>
-    </div>
-
-    <div class="details-section">
-      <h3 style="color: #333; margin-bottom: 20px;">Detection Details</h3>
-      <div class="detail-grid">
-        <div class="detail-card">
-          <div class="detail-label">ML Score</div>
-          <div class="detail-value" id="ml-score">--</div>
-        </div>
-        <div class="detail-card">
-          <div class="detail-label">Heuristic Score</div>
-          <div class="detail-value" id="heuristic-score">--</div>
-        </div>
-        <div class="detail-card">
-          <div class="detail-label">Detection Method</div>
-          <div class="detail-value">AI + Rules</div>
-        </div>
+  <main class="warning-container" role="main">
+    <header class="warning-header">
+      <div class="shield-icon" aria-hidden="true">🛡️</div>
+      <div class="header-text">
+        <h1>Dangerous Website Blocked</h1>
+        <p>PhishLens Web Shield prevented this page from loading to protect your security.</p>
       </div>
+    </header>
+
+    <div class="risk-banner">
+      <span class="risk-banner-label">Flagged by PhishLens Local Defense Engine</span>
+      <span class="risk-score-pill" id="score-pill">Risk: --/100</span>
     </div>
 
-    <div class="buttons">
-      <button class="btn btn-safe" id="go-back">
-        <span class="shield-icon">🏠</span>
-        Go to Safe Page
-      </button>
-      <button class="btn btn-risk" id="proceed-anyway">
-        ⚠️ Proceed Anyway (Not Recommended)
-      </button>
-    </div>
+    <section class="target-box" aria-labelledby="target-label">
+      <div class="target-label" id="target-label">Target Website</div>
+      <div class="target-url" id="target-url">Loading...</div>
+    </section>
 
-    <div class="info-box">
-      <strong>🔒 Your Safety is Our Priority</strong><br>
-      This warning is generated using machine learning and heuristic analysis to protect you from phishing, malware, and other online threats.
-    </div>
-  </div>
+    <section class="details-box">
+      <h3>Detection Reason</h3>
+      <ul class="details-list" id="reasons-list">
+        <li>Analyzing destination indicators...</li>
+      </ul>
+    </section>
+
+    <aside class="disclaimer-box">
+      <strong>Note on False Positives:</strong> Automated heuristics and ML models can occasionally flag benign sites that exhibit unusual URL patterns. If you are certain this destination is safe, you may bypass this warning below.
+    </aside>
+
+    <footer class="actions-group">
+      <button class="btn btn-primary-safe" id="btn-back">
+        <span>←</span>
+        <span>Return to Safety</span>
+      </button>
+
+      <button class="btn btn-danger-outline" id="btn-proceed">
+        <span>Proceed Anyway (Unsafe)</span>
+      </button>
+    </footer>
+  </main>
 
   <script src="blocked.js"></script>
 </body>

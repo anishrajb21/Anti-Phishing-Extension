@@ -1,0 +1,81 @@
+url,label,source,category,notes
+https://www.google.com/search?q=cybersecurity,0,Tranco,search,Legitimate search engine
+https://github.com/torvalds/linux,0,Tranco,developer,Open-source repository
+https://en.wikipedia.org/wiki/Phishing,0,Tranco,encyclopedia,Legitimate reference
+https://www.microsoft.com/en-us/security,0,Tranco,technology,Legitimate vendor
+https://apple.com/iphone,0,Tranco,hardware,Legitimate vendor
+https://developer.mozilla.org/en-US/docs/Web/API,0,Tranco,documentation,Web documentation
+https://www.amazon.com/gp/help/customer/display.html,0,Tranco,ecommerce,Help portal
+https://news.ycombinator.com/item?id=12345,0,Tranco,community,Discussion forum
+https://stackoverflow.com/questions/11227809,0,Tranco,community,Technical forum
+https://www.paypal.com/signin,0,Tranco,finance,Legitimate banking login
+https://www.chase.com/personal/banking,0,Tranco,finance,Official banking portal
+https://docs.python.org/3/library/urllib.parse.html,0,Tranco,documentation,Python docs
+https://www.netflix.com/browse,0,Tranco,streaming,Legitimate streaming service
+https://www.cloudflare.com/learning/security/what-is-phishing/,0,Tranco,security,Security reference
+https://reddit.com/r/netsec,0,Tranco,community,Subreddit
+https://www.linkedin.com/feed/,0,Tranco,social,Professional network
+https://www.youtube.com/watch?v=dQw4w9WgXcQ,0,Tranco,video,Official video portal
+https://store.steampowered.com/app/570/Dota_2/,0,Tranco,gaming,Gaming platform
+https://www.dropbox.com/home,0,Tranco,storage,Cloud storage
+https://slack.com/workspace-signin,0,Tranco,collaboration,Workplace app
+https://gitlab.com/explore,0,Tranco,developer,Git platform
+https://www.eff.org/pages/privacy-badger,0,Tranco,advocacy,Digital rights organization
+https://cve.mitre.org/cve/,0,Tranco,security,Vulnerability database
+https://nvd.nist.gov/vuln,0,Tranco,security,National Vulnerability Database
+https://www.w3.org/standards/,0,Tranco,standards,Web standards consortium
+https://httpbin.org/get,0,Tranco,api,Testing API
+https://go.dev/doc/tutorial/getting-started,0,Tranco,developer,Go documentation
+https://crates.io/crates/serde,0,Tranco,registry,Rust crate registry
+https://pypi.org/project/scikit-learn/,0,Tranco,registry,Python package registry
+https://registry.npmjs.org/express,0,Tranco,registry,Node package registry
+http://example.com/about,0,IANA,reference,Test domain
+https://www.nationalgeographic.com/animals,0,Tranco,media,Publication
+https://www.harvard.edu/programs,0,Edu,education,Academic institution
+https://www.mit.edu/research,0,Edu,education,Academic institution
+https://www.gov.uk/browse/visas-immigration,0,Gov,government,Government portal
+https://www.irs.gov/payments,0,Gov,government,Official government tax service
+https://usps.com/tracking,0,Gov,logistics,Official postal service
+https://www.bankofamerica.com/login,0,Tranco,finance,Official online banking
+https://www.wellsfargo.com/help/,0,Tranco,finance,Official financial portal
+https://twitter.com/explore,0,Tranco,social,Social media portal
+http://192.168.1.100/admin/login.php,1,SyntheticPhish,ip_host,Numeric IP host targeting admin credentials
+http://203.0.113.45:8080/secure/bank/verify,1,SyntheticPhish,ip_host,IP address with non-standard port and finance keywords
+http://admin:secret@attacker-domain.com/login,1,SyntheticPhish,authority_obfuscation,Authority userinfo trick with credentials
+https://google.com:auth-token@evil-phishing-host.net/update,1,SyntheticPhish,authority_obfuscation,Google branded authority trick
+https://paypa1-security-verification.xyz/account/login,1,SyntheticPhish,leetspeak_typosquat,Leetspeak brand impersonation on suspicious TLD
+https://g00gle-drive-shared-doc.top/view.html,1,SyntheticPhish,leetspeak_typosquat,Google Drive credential harvesting on .top
+https://login.microsoft.com.account-update.link/auth,1,SyntheticPhish,subdomain_deception,Subdomain mimicry targeting Microsoft Office
+https://chase.com.identity-confirm.racing/verify,1,SyntheticPhish,subdomain_deception,Chase banking subdomain mimicry on disposable TLD
+https://paypal-account-center.click/signin?session=39485,1,SyntheticPhish,combosquatting,Combosquatting on .click TLD
+https://apple-id-suspended-recovery.download/unlock,1,SyntheticPhish,combosquatting,Apple ID recovery credential theft on .download
+https://netflix-subscription-renew.stream/billing,1,SyntheticPhish,combosquatting,Netflix subscription billing phish on .stream
+https://steam-community-free-skins.party/trade,1,SyntheticPhish,combosquatting,Steam community inventory scam on .party
+https://bankofamerica-alert-center.top/signon,1,SyntheticPhish,combosquatting,Bank of America spoofed security alert
+https://wellsfargo-verify-notice.work/signon,1,SyntheticPhish,combosquatting,Wells Fargo notice on .work TLD
+https://binance-security-kyc.xyz/verification,1,SyntheticPhish,crypto_phish,Binance KYC credential stealer on .xyz
+https://coinbase-wallet-connect.top/import-phrase,1,SyntheticPhish,crypto_phish,Coinbase wallet seed phrase harvesting
+https://secure-login-portal-verification-9812489124.com/auth,1,SyntheticPhish,high_digits,High digit count randomized phishing kit
+https://x78ab12c98d0ef1482910fa.xyz/login,1,SyntheticPhish,dga,DGA high entropy domain on .xyz
+https://amaz0n-prime-order-update.xyz/billing/confirm,1,SyntheticPhish,leetspeak_typosquat,Amazon prime spoofing with leetspeak on .xyz
+https://dhl-package-tracking-fee.click/delivery?id=9876,1,SyntheticPhish,logistics_scam,DHL package fee delivery scam
+https://usps-tracking-redelivery-fee.top/pay,1,SyntheticPhish,logistics_scam,USPS redelivery payment scam on .top
+https://fedex-parcel-status-update.download/track,1,SyntheticPhish,logistics_scam,FedEx parcel tracking trap on .download
+https://walmart-giftcard-winner-survey.party/claim,1,SyntheticPhish,survey_scam,Walmart gift card survey trap
+https://discord-nitro-gift-claim.xyz/redeem,1,SyntheticPhish,gaming_scam,Discord Nitro token stealer
+https://roblox-free-robux-generator.top/get,1,SyntheticPhish,gaming_scam,Roblox credentials stealer
+https://whatsapp-web-qr-login.stream/scan,1,SyntheticPhish,social_scam,WhatsApp session takeover QR phishing
+https://telegram-premium-free.racing/claim,1,SyntheticPhish,social_scam,Telegram premium scam on .racing
+https://dropbox-file-download-viewer.work/shared,1,SyntheticPhish,file_phish,Dropbox credential harvesting attachment
+https://irs-tax-refund-claim-portal.top/forms,1,SyntheticPhish,gov_impersonation,IRS tax refund credential harvesting
+http://unencrypted-login-bank-verification.com/entry,1,SyntheticPhish,insecure_phish,Plaintext HTTP financial portal spoof
+http://54.210.12.98/paypal/login,1,SyntheticPhish,ip_host,Direct IP hosting Paypal login form
+http://198.51.100.22/secure/chase/index.htm,1,SyntheticPhish,ip_host,Direct IP hosting Chase login page
+https://github-security-alert-pat.xyz/revoke,1,SyntheticPhish,developer_phish,GitHub Personal Access Token phishing
+https://office365-password-expiration.link/reset,1,SyntheticPhish,enterprise_phish,Office 365 password expiration notice
+https://citibank-mobile-alert.top/verify,1,SyntheticPhish,combosquatting,Citibank mobile alert on .top
+https://instagram-copyright-infringement.click/appeal,1,SyntheticPhish,social_phish,Instagram copyright appeal phishing
+https://twitter-blue-verification-free.party/apply,1,SyntheticPhish,social_phish,Twitter Blue badge phishing on .party
+https://ebay-buyer-protection-claim.stream/case,1,SyntheticPhish,ecommerce_phish,eBay claim phishing on .stream
+https://yahoo-mail-storage-full.top/upgrade,1,SyntheticPhish,email_phish,Yahoo mail quota upgrade phish
+https://outlook-mailbox-re-authenticate.work/login,1,SyntheticPhish,email_phish,Outlook re-authentication lure

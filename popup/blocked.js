@@ -1,66 +1,89 @@
-// PhishLens Blocked Page Script
-// Handles the warning page when unsafe sites are blocked
+/**
+ * PhishLens Blocked Interstitial Page Script
+ * Safely renders warning details and provides controlled bypass authorization.
+ */
 
 document.addEventListener('DOMContentLoaded', () => {
-  // Parse URL parameters
   const urlParams = new URLSearchParams(window.location.search);
-  const blockedUrl = urlParams.get('url');
-  const score = urlParams.get('score');
-  const reason = urlParams.get('reason');
+  const rawTargetUrl = urlParams.get('url') || '';
+  const scoreParam = urlParams.get('score');
+  const reasonParam = urlParams.get('reason');
 
-  // Display blocked URL
-  if (blockedUrl) {
-    document.getElementById('blocked-url').textContent = blockedUrl;
+  const targetUrlEl = document.getElementById('target-url');
+  const scorePillEl = document.getElementById('score-pill');
+  const reasonsListEl = document.getElementById('reasons-list');
+  const btnBack = document.getElementById('btn-back');
+  const btnProceed = document.getElementById('btn-proceed');
+
+  // Display URL safely
+  if (rawTargetUrl) {
+    try {
+      const parsed = new URL(rawTargetUrl);
+      targetUrlEl.textContent = `${parsed.protocol}//${parsed.hostname}${parsed.pathname}`;
+    } catch {
+      targetUrlEl.textContent = rawTargetUrl;
+    }
+  } else {
+    targetUrlEl.textContent = 'Unknown destination';
   }
 
-  // Display risk score
-  if (score) {
-    document.getElementById('score-display').textContent = score;
+  // Display Score
+  if (scoreParam) {
+    scorePillEl.textContent = `Risk: ${scoreParam}/100`;
   }
 
-  // Display reasons
-  if (reason) {
-    const reasonsList = document.getElementById('risk-list');
-    reasonsList.innerHTML = '';
-    
-    // Split reasons by period and create list items
-    const reasons = reason.split('. ').filter(r => r.trim());
+  // Display Reasons safely using textContent
+  if (reasonParam) {
+    reasonsListEl.innerHTML = '';
+    const reasons = reasonParam.split('. ').filter(Boolean);
     reasons.forEach(r => {
       const li = document.createElement('li');
       li.textContent = r.trim() + (r.endsWith('.') ? '' : '.');
-      reasonsList.appendChild(li);
+      reasonsListEl.appendChild(li);
     });
   }
 
-  // Go Back button
-  document.getElementById('go-back').addEventListener('click', () => {
-    // Navigate to a safe page
-    window.location.href = 'https://www.google.com';
+  // Action: Return to Safety
+  btnBack.addEventListener('click', () => {
+    if (window.history.length > 1) {
+      window.history.back();
+    } else {
+      window.location.href = 'https://www.google.com';
+    }
   });
 
-  // Proceed Anyway button (with confirmation)
-  document.getElementById('proceed-anyway').addEventListener('click', () => {
-    const confirmed = confirm(
-      '⚠️ WARNING: You are about to visit a potentially dangerous website!\n\n' +
-      'This site has been flagged as suspicious and may:\n' +
-      '• Steal your passwords and personal information\n' +
-      '• Install malware on your device\n' +
-      '• Trick you into revealing financial data\n\n' +
-      'Are you ABSOLUTELY SURE you want to proceed?'
+  // Action: Proceed Anyway with session bypass authorization
+  btnProceed.addEventListener('click', async () => {
+    if (!rawTargetUrl) return;
+
+    const confirmed = window.confirm(
+      '⚠️ SECURITY WARNING: Are you sure you want to visit this website?\n\n' +
+      'PhishLens flagged this destination as high-risk. Phishing websites can steal your passwords, credit cards, or personal accounts.\n\n' +
+      'Click OK to proceed at your own risk.'
     );
 
-    if (confirmed) {
-      const doubleConfirm = confirm(
-        '⚠️ FINAL WARNING!\n\n' +
-        'PhishLens strongly recommends NOT visiting this site.\n\n' +
-        'Risk Score: ' + score + '/100\n\n' +
-        'Click OK only if you fully understand the risks and trust this website.'
-      );
+    if (!confirmed) return;
 
-      if (doubleConfirm && blockedUrl) {
-        // Allow user to proceed at their own risk
-        window.location.href = blockedUrl;
+    try {
+      btnProceed.textContent = 'Authorizing bypass...';
+      btnProceed.disabled = true;
+
+      // Request background service worker to grant a temporary session bypass for this URL
+      const response = await chrome.runtime.sendMessage({
+        action: 'grantBypass',
+        url: rawTargetUrl
+      });
+
+      if (response && response.success) {
+        // Safe navigation without infinite redirect loop
+        window.location.replace(rawTargetUrl);
+      } else {
+        // Fallback navigation
+        window.location.href = rawTargetUrl;
       }
+    } catch (err) {
+      console.error('[PhishLens] Error requesting bypass:', err);
+      window.location.href = rawTargetUrl;
     }
   });
 });

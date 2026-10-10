@@ -1,7 +1,7 @@
 {
   "modelType": "logistic_regression",
-  "version": "1.0.0",
-  "description": "Lightweight ML model for phishing detection trained on URL features",
+  "version": "1.1.0",
+  "description": "Calibrated Logistic Regression model for URL phishing detection",
   "features": [
     "urlLength_normalized",
     "numDots_normalized",
@@ -17,43 +17,64 @@
     "hasAtSymbol"
   ],
   "weights": [
-    0.45,
-    0.38,
-    0.52,
-    2.85,
-    -1.42,
-    1.68,
-    0.34,
-    0.61,
-    1.95,
-    0.29,
-    0.41,
-    2.12
+    0.4241,
+    -0.0723,
+    1.3463,
+    0.7388,
+    -1.2167,
+    1.8174,
+    0.0094,
+    0.4067,
+    1.6326,
+    0.9758,
+    1.0316,
+    0.4564
   ],
-  "bias": -1.85,
-  "threshold": 0.5,
+  "bias": -1.4114,
+  "threshold": 0.42,
   "trainingInfo": {
-    "accuracy": 0.923,
-    "precision": 0.915,
-    "recall": 0.908,
-    "f1Score": 0.911,
-    "trainingDate": "2025-01-15",
-    "sampleSize": 15000,
-    "description": "Trained on dataset combining legitimate websites and known phishing URLs with balanced sampling"
+    "trainingDate": "2026-10-10",
+    "sampleSize": 80,
+    "trainSamples": 56,
+    "valSamples": 12,
+    "testSamples": 12,
+    "accuracy": 0.9167,
+    "precision": 1.0,
+    "recall": 0.8333,
+    "f1Score": 0.9091,
+    "rocAuc": 1.0,
+    "prAuc": 1.0,
+    "baselineAccuracy": 0.5,
+    "provenance": "Curated benchmark dataset combining Tranco Top 1M domains and synthetic/verified phishing kits"
   },
   "normalization": {
-    "urlLength": { "divide": 100 },
-    "numDots": { "divide": 5 },
-    "numHyphens": { "divide": 5 },
-    "numSpecialChars": { "divide": 10 },
-    "domainEntropy": { "divide": 5 },
-    "numDigits": { "divide": 10 },
-    "hostnameLength": { "divide": 50 }
-  },
-  "notes": [
-    "This is a lightweight logistic regression model optimized for browser performance",
-    "Weights are calibrated to work in combination with heuristic rules",
-    "Model uses sigmoid activation: output = 1 / (1 + exp(-(weights·features + bias)))",
-    "Higher output values (closer to 1) indicate higher phishing probability"
-  ]
+    "urlLength": {
+      "divide": 100,
+      "cap": 5.0
+    },
+    "numDots": {
+      "divide": 5,
+      "cap": 5.0
+    },
+    "numHyphens": {
+      "divide": 5,
+      "cap": 5.0
+    },
+    "numSpecialChars": {
+      "divide": 10,
+      "cap": 5.0
+    },
+    "domainEntropy": {
+      "divide": 5,
+      "cap": 5.0
+    },
+    "numDigits": {
+      "divide": 10,
+      "cap": 5.0
+    },
+    "hostnameLength": {
+      "divide": 50,
+      "cap": 5.0
+    }
+  }
 }
