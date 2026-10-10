@@ -13,19 +13,20 @@
 
 ```mermaid
 graph TD
-    UserNav[User Navigates to URL] --> NavEvent[chrome.webNavigation.onBeforeNavigate]
-    NavEvent --> ASW[Service Worker: background.js]
-    ASW --> FE[extractFeatures]
-    FE --> HE[heuristicDetection]
-    FE --> ML[predictWithML]
-    ASW --> WHOIS[Broken External WHOIS API]
-    HE & ML --> CombinedScore[combinedScore = ML*50 + Heuristic*0.5]
-    CombinedScore --> Decision{Score >= 40?}
-    Decision -- Yes --> Redirect[chrome.tabs.update -> blocked.html]
-    Decision -- No --> Cache[detectionCache.set]
-    Redirect --> LoopRisk[User clicks Proceed -> Infinite Redirect Loop!]
-    Cache --> CS[content.js: Injects Green/Red DOM Banners]
-    Cache --> Popup[popup.js: Displays Breakdown]
+    UserNav["User Navigates to URL"] --> NavEvent["chrome.webNavigation.onBeforeNavigate"]
+    NavEvent --> ASW["Service Worker: background.js"]
+    ASW --> FE["extractFeatures"]
+    FE --> HE["heuristicDetection"]
+    FE --> ML["predictWithML"]
+    ASW --> WHOIS["Broken External WHOIS API"]
+    HE --> CombinedScore["combinedScore Formula"]
+    ML --> CombinedScore
+    CombinedScore --> Decision{"Score >= 40?"}
+    Decision -->|Yes| Redirect["chrome.tabs.update -> blocked.html"]
+    Decision -->|No| Cache["detectionCache.set"]
+    Redirect --> LoopRisk["User clicks Proceed -> Infinite Redirect Loop!"]
+    Cache --> CS["content.js: Injects DOM Banners"]
+    Cache --> Popup["popup.js: Displays Breakdown"]
 ```
 
 ### Existing Components:

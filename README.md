@@ -39,26 +39,28 @@ Traditional extension solutions often rely on cloud lookups that compromise user
 
 ```mermaid
 flowchart TD
-    UserNav[User Navigates to Destination URL] --> WN_Before[chrome.webNavigation.onBeforeNavigate]
-    WN_Before --> BypassCheck{Session Bypassed?}
-    BypassCheck -- Yes --> Allow[Allow Navigation with Warning Badge]
-    BypassCheck -- No --> CacheCheck{Cached Verdict?}
-    CacheCheck -- Hit --> Apply[Apply Cached Result]
-    CacheCheck -- Miss --> Scorer[RiskScorer Pipeline]
+    UserNav["User Navigates to Destination URL"] --> WN_Before["chrome.webNavigation.onBeforeNavigate"]
+    WN_Before --> BypassCheck{"Session Bypassed?"}
+    BypassCheck -->|Yes| Allow["Allow Navigation with Warning Badge"]
+    BypassCheck -->|No| CacheCheck{"Cached Verdict?"}
+    CacheCheck -->|Hit| Apply["Apply Cached Result"]
+    CacheCheck -->|Miss| Scorer["RiskScorer Pipeline"]
 
-    subgraph Defense Engine [src/engine/]
-        Scorer --> Parser[Safe URL Parser & PSL Extractor]
-        Parser --> FE[Feature Extractor - 12 Normalized Metrics]
-        FE --> HE[Heuristic Engine - 12 Cybersecurity Rules]
-        FE --> ML[ML Engine - Logistic Regression]
-        Parser --> TI[Threat Intelligence Manager - Local Cache]
-        HE & ML & TI --> Aggregator[Risk Aggregator & Calibrator]
+    subgraph DefenseEngine ["Defense Engine"]
+        Scorer --> Parser["Safe URL Parser & PSL Extractor"]
+        Parser --> FE["Feature Extractor - 12 Normalized Metrics"]
+        FE --> HE["Heuristic Engine - 12 Cybersecurity Rules"]
+        FE --> ML["ML Engine - Logistic Regression"]
+        Parser --> TI["Threat Intelligence Manager - Local Cache"]
+        HE --> Aggregator["Risk Aggregator & Calibrator"]
+        ML --> Aggregator
+        TI --> Aggregator
     end
 
-    Aggregator --> Verdict{Classification}
-    Verdict -- HIGH_RISK (Score >= 70) --> Block[Redirect tab to popup/blocked.html]
-    Verdict -- SUSPICIOUS (Score 35-69) --> Alert[onCommitted -> Banner via content.js]
-    Verdict -- LOW_RISK (Score < 35) --> Safe[Update Action Badge to Checkmark]
+    Aggregator --> Verdict{"Classification"}
+    Verdict -->|High Risk: Score 70+| Block["Redirect tab to popup/blocked.html"]
+    Verdict -->|Suspicious: Score 35-69| Alert["onCommitted Banner via content.js"]
+    Verdict -->|Low Risk: Score 0-34| Safe["Update Action Badge to Checkmark"]
 ```
 
 ### Detection Engine Flow:

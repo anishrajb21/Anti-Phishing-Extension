@@ -6,33 +6,35 @@ PhishLens Web Shield is implemented as a modern **Chromium Manifest V3 (MV3)** b
 
 ```mermaid
 flowchart TD
-    subgraph Browser Navigation Lifecycle
-        UserNav[User Enters URL / Clicks Link] --> WN_Before[chrome.webNavigation.onBeforeNavigate]
-        WN_Before --> CheckBypass{Session Bypassed?}
-        CheckBypass -- Yes --> AllowPass[Allow Navigation]
-        CheckBypass -- No --> CacheCheck{In Session Cache?}
-        CacheCheck -- Hit --> Verdict[Apply Cached Verdict]
-        CacheCheck -- Miss --> Scorer[RiskScorer Pipeline]
+    subgraph BrowserLifecycle ["Browser Navigation Lifecycle"]
+        UserNav["User Enters URL / Clicks Link"] --> WN_Before["chrome.webNavigation.onBeforeNavigate"]
+        WN_Before --> CheckBypass{"Session Bypassed?"}
+        CheckBypass -->|Yes| AllowPass["Allow Navigation"]
+        CheckBypass -->|No| CacheCheck{"In Session Cache?"}
+        CacheCheck -->|Hit| Verdict["Apply Cached Verdict"]
+        CacheCheck -->|Miss| Scorer["RiskScorer Pipeline"]
     end
 
-    subgraph Detection Pipeline [src/engine/]
-        Scorer --> URLP[Safe URL Parser / PSL]
-        URLP --> FE[Feature Extractor - 12 Features]
-        FE --> HE[Heuristic Engine - 12 Rules]
-        FE --> ML[ML Engine - Logistic Regression]
-        URLP --> TI[Threat Intel Manager - Local Cache]
-        HE & ML & TI --> RiskAgg[Risk Aggregator & Calibrator]
-        RiskAgg --> FinalVerdict[Category: LOW_RISK | SUSPICIOUS | HIGH_RISK]
+    subgraph DetectionPipeline ["Detection Pipeline"]
+        Scorer --> URLP["Safe URL Parser / PSL"]
+        URLP --> FE["Feature Extractor - 12 Features"]
+        FE --> HE["Heuristic Engine - 12 Rules"]
+        FE --> ML["ML Engine - Logistic Regression"]
+        URLP --> TI["Threat Intel Manager - Local Cache"]
+        HE --> RiskAgg["Risk Aggregator & Calibrator"]
+        ML --> RiskAgg
+        TI --> RiskAgg
+        RiskAgg --> FinalVerdict["Classification Result"]
     end
 
-    subgraph Enforcement & UI Presentation
-        FinalVerdict --> DecisionBranch{Verdict Category}
-        DecisionBranch -- HIGH_RISK --> BlockPage[Redirect tab to popup/blocked.html]
-        DecisionBranch -- SUSPICIOUS --> PostNav[onCommitted -> Notice Banner via content.js]
-        DecisionBranch -- LOW_RISK --> Quiet[Action Badge Checkmark]
+    subgraph EnforcementUI ["Enforcement & UI Presentation"]
+        FinalVerdict --> DecisionBranch{"Verdict Category"}
+        DecisionBranch -->|HIGH_RISK| BlockPage["Redirect tab to popup/blocked.html"]
+        DecisionBranch -->|SUSPICIOUS| PostNav["onCommitted Notice Banner via content.js"]
+        DecisionBranch -->|LOW_RISK| Quiet["Action Badge Checkmark"]
         
-        BlockPage -- "User clicks Proceed Anyway" --> GrantBypass[sessionManager.grantBypass]
-        GrantBypass --> Reload[window.location.replace URL]
+        BlockPage -->|User clicks Proceed Anyway| GrantBypass["sessionManager.grantBypass"]
+        GrantBypass --> Reload["window.location.replace URL"]
     end
 ```
 
