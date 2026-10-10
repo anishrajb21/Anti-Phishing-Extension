@@ -2,7 +2,7 @@
 node_modules/
 .npm/
 
-# Python
+# Python & ML
 __pycache__/
 *.py[cod]
 *$py.class
@@ -25,7 +25,7 @@ wheels/
 .installed.cfg
 *.egg
 
-# Pytest / Virtual Environments
+# Pytest / Coverage / Virtual Environments
 .pytest_cache/
 .coverage
 htmlcov/
@@ -33,7 +33,30 @@ venv/
 ENV/
 env/
 
-# IDE / System
+# Environment Variables & Secrets
+.env
+.env.*
+*.env
+*.pem
+*.key
+*.cert
+*.pfx
+*.p12
+credentials.json
+client_secret*.json
+service-account*.json
+
+# Databases
+*.sqlite
+*.sqlite3
+*.db
+
+# Temporary & Scratch
+tmp/
+temp/
+scratch/
+
+# IDE & OS System Files
 .vscode/
 .idea/
 .DS_Store
